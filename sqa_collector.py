@@ -16,7 +16,9 @@ session = DBSession()
 
 @app.route('/', methods=['GET'])
 def display():
-    html = '<html><head><title>Blobs</title></head><body><table border=1><tr><th>id</th><th>started</th><th>ended</th><th>raised_by</th><th>short</th></tr>'
+    html = '<html><head><title>Blobs</title></head>' 
+    html += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"><style>td { padding: 15px; }</style>'
+    html += '<body><table border=1><tr><th>id</th><th>started</th><th>ended</th><th>raised_by</th><th>short</th></tr>'
     for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(50):
         html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.ended, alarm.raised_by, alarm.short)
     html += '</table></body></html>'
