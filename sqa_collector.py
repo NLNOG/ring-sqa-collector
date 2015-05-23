@@ -43,7 +43,7 @@ def store():
             session.add(SqaCollector(started=datetime.datetime.today(), raised_by=raised_by, afi=afi, short=short))
             session.commit()
         elif blob['status'] == 'clear':
-            open_alarms = session.query(SqaCollector).filter(and_(SqaCollector.afi==afi, SqaCollector.ended==None))
+            open_alarms = session.query(SqaCollector).filter(and_(SqaCollector.raised_by==raised_by, SqaCollector.afi==afi, SqaCollector.ended==None))
             if open_alarms:
                 for open_alarm in open_alarms:
                     open_alarm.ended=datetime.datetime.today()
