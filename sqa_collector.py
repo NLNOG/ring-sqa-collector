@@ -69,9 +69,9 @@ def display():
       </div>
       <div class="row">
 '''
-    html += '<table id="results" class="table table-bordered"><thead><tr><th>id</th><th>started</th><th>ended</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
+    html += '<table id="results" class="table table-bordered"><thead><tr><th>id</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
     for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(50):
-        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.ended, alarm.raised_by, alarm.short)
+        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.short)
     html += '</tbody></table>'
     html += '''
         </div>
