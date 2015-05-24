@@ -79,7 +79,7 @@ def display():
     <script src="http://code.jquery.com/jquery-git1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="/jquery.dynatable.js"></script>
-    <script>$(document).ready(function() { $('#results').dynatable(); })</script> 
+    <script>$(document).ready(function() { $.dynatableSetup({dataset: { perPageDefault: 50 }}); $('#results').dynatable(); })</script> 
 </body>
 </html>
 '''
