@@ -85,6 +85,7 @@ def display():
             $(document).ready(function() { 
                 $.dynatableSetup({dataset: { perPageDefault: 50 }, writers: { _rowWriter: tableRowWriter}}); 
                 $('#results').dynatable(); 
+                $('#results').css('cursor','pointer');
             });
 
             function tableRowWriter(rowIndex, record, columns, cellWriter) {
