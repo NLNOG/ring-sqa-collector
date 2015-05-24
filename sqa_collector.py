@@ -100,7 +100,7 @@ def display():
 
             function showText(id) {
                 var url = '/text/' + id;
-                $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alert ' + id + '</h4></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
+                $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alert ' + id + '</h4><a href="/view/' + id + '">permalink</a></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
                 $.ajax({url: url, success: function(result){
                     $('#textModal-body-text').text(result);
                     $('#textModal').modal('show'); 
@@ -149,6 +149,13 @@ def store():
 
     session.close()
     return return_code
+
+@app.route('/view/<id>', methods=['GET'])
+def render_text(id):
+    html = '<pre>'
+    html += display_text(id)
+    html += '</pre>'
+    return html
 
 @app.route('/text/<id>', methods=['GET'])
 def display_text(id):
