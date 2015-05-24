@@ -10,9 +10,9 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 if USE_MYSQL_TYPES:
-    from sqlalchemy.dialects.mysql import INTEGER, DATETIME, VARCHAR, ENUM
+    from sqlalchemy.dialects.mysql import INTEGER, DATETIME, VARCHAR, ENUM, TEXT
 else:
-    from sqlalchemy import Integer as INTEGER, DateTime as DATETIME, String as VARCHAR, Enum as ENUM
+    from sqlalchemy import Integer as INTEGER, DateTime as DATETIME, String as VARCHAR, Enum as ENUM, Text as TEXT
 
 DECLARATIVE_BASE = declarative_base()
 
@@ -30,6 +30,7 @@ class SqaCollector(DECLARATIVE_BASE):
     raised_by = Column(VARCHAR(45), default='unknown', nullable=False)
     afi = Column(ENUM('ipv4','ipv6'), default='ipv4', nullable=False)
     short = Column(VARCHAR(100), nullable=False)
+    long = Column(TEXT, nullable=True)
 
     def __repr__(self):
         return self.__str__()

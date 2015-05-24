@@ -5,5 +5,6 @@ CREATE TABLE `sqa_collector` (
   `raised_by` varchar(45) NOT NULL DEFAULT 'unknown',
   `afi` enum('ipv4','ipv6') NOT NULL DEFAULT 'ipv4',
   `short` varchar(100) DEFAULT NULL,
+  `long` TEXT DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1

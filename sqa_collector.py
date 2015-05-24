@@ -71,15 +71,33 @@ def display():
 '''
     html += '<table id="results" class="table table-bordered"><thead><tr><th>id</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
     for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(50):
-        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.short)
+        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td onClick='showText(%s);'>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.id, alarm.short)
     html += '</tbody></table>'
     html += '''
         </div>
     </div>
+    <div class="modal fade" id="text" tabindex="-1" role="dialog" aria-labelledby="inspectorLabel" aria-hidden="true"/>
     <script src="http://code.jquery.com/jquery-git1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="/jquery.dynatable.js"></script>
-    <script>$(document).ready(function() { $.dynatableSetup({dataset: { perPageDefault: 50 }}); $('#results').dynatable(); })</script> 
+    <script>
+            $(document).ready(function() { 
+                $.dynatableSetup({dataset: { perPageDefault: 50 }}); 
+                $('#results').dynatable(); 
+            });
+
+            function showText(id) {
+                var url = '/' + id;
+                text_html = '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - ' + id + '</h4></div><div class="modal-body"><pre>';'
+                $.ajax({url: "demo_test.txt", success: function(result){
+                    text_html += result;
+                }
+                text_html += '</pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>';
+                $('#text').html(text_html);
+                $('#text').modal('show'); 
+            }
+
+    </script> 
 </body>
 </html>
 '''
@@ -91,6 +109,7 @@ def store():
         blob    = json.loads(request.get_data())
         afi     = blob['afi']
         short   = blob['short']
+        long    = blob['long']
         try:
             raised_by = socket.gethostbyaddr(request.remote_addr)[0]
             if '.' in raised_by:
@@ -101,7 +120,7 @@ def store():
             return "FAIL 2"
 
         if blob['status'] == 'raise':
-            session.add(SqaCollector(started=datetime.datetime.today(), raised_by=raised_by, afi=afi, short=short))
+            session.add(SqaCollector(started=datetime.datetime.today(), raised_by=raised_by, afi=afi, short=short, long=long))
             session.commit()
         elif blob['status'] == 'clear':
             open_alarms = session.query(SqaCollector).filter(and_(SqaCollector.raised_by==raised_by, SqaCollector.afi==afi, SqaCollector.ended==None))
@@ -114,6 +133,18 @@ def store():
         return "FAIL 3"
     else:
         return "OK"
+
+@app.route('/text/<id>', methods=['GET'])
+def display_text(id):
+    html = 'No alarm text.'
+    try:
+        results = session.query(SqaCollector).filter(SqaCollector.id==id)
+        if results:
+            for result in results:
+                html = result.long
+    except Exception, e:
+        print e
+    return html
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)
