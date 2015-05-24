@@ -7,6 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqa_collector_db import DECLARATIVE_BASE, SqaCollector
 
 app = Flask(__name__, static_url_path='')
+app.debug = False
 
 enginestr = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
 engine = create_engine(enginestr)
@@ -39,7 +40,7 @@ def display():
     <!--[if lt IE 9]>
         <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <style>th { background: #999999; }</style>
+    <style>th { background: #999999; } .modal-dialog { width: 800px; }</style>
 </head>
 
 <body>
@@ -71,40 +72,51 @@ def display():
 '''
     html += '<table id="results" class="table table-bordered"><thead><tr><th>id</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
     for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(50):
-        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td onClick='showText(%s);'>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.id, alarm.short)
+        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.short)
     html += '</tbody></table>'
     html += '''
         </div>
     </div>
-    <div class="modal fade" id="text" tabindex="-1" role="dialog" aria-labelledby="inspectorLabel" aria-hidden="true"/>
+    <div class="modal fade" id="textModal" tabindex="-1" role="dialog" aria-labelledby="textModalLabel" aria-hidden="true"></div>
     <script src="http://code.jquery.com/jquery-git1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="/jquery.dynatable.js"></script>
     <script>
             $(document).ready(function() { 
-                $.dynatableSetup({dataset: { perPageDefault: 50 }}); 
+                $.dynatableSetup({dataset: { perPageDefault: 50 }, writers: { _rowWriter: tableRowWriter}}); 
                 $('#results').dynatable(); 
             });
 
+            function tableRowWriter(rowIndex, record, columns, cellWriter) {
+                row = '<tr>' + tableRowTdMaker(record.id, record.id) + tableRowTdMaker(record.id, record.timestamp) + tableRowTdMaker(record.id, record.raised_by) + tableRowTdMaker(record.id, record.short) + '</tr>';
+                return row;
+            }
+
+            function tableRowTdMaker(id, body) {
+                row = '<td style="text-align: left;" onClick="showText(' + id + ');">' + body + '</td>';
+                return row;
+            }
+
             function showText(id) {
-                var url = '/' + id;
-                text_html = '<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - ' + id + '</h4></div><div class="modal-body"><pre>';'
-                $.ajax({url: "demo_test.txt", success: function(result){
-                    text_html += result;
-                }
-                text_html += '</pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>';
-                $('#text').html(text_html);
-                $('#text').modal('show'); 
+                var url = '/text/' + id;
+                $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alert ' + id + '</h4></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
+                $.ajax({url: url, success: function(result){
+                    $('#textModal-body-text').text(result);
+                    $('#textModal').modal('show'); 
+                    $('#textModal').css({ 'display': 'block' });
+                }});
             }
 
     </script> 
 </body>
 </html>
 '''
+    session.close()
     return html
 
 @app.route('/', methods=['POST'])
 def store():
+    return_code = 'FAIL 0'
     try:
         blob    = json.loads(request.get_data())
         afi     = blob['afi']
@@ -114,10 +126,10 @@ def store():
             raised_by = socket.gethostbyaddr(request.remote_addr)[0]
             if '.' in raised_by:
                 print "Unrecognised sending host %s" % raised_by
-                return "FAIL 1"
+                return_code = 'FAIL 1'
         except Exception, e:
             print e
-            return "FAIL 2"
+            return_code = 'FAIL 2'
 
         if blob['status'] == 'raise':
             session.add(SqaCollector(started=datetime.datetime.today(), raised_by=raised_by, afi=afi, short=short, long=long))
@@ -130,9 +142,12 @@ def store():
             session.commit()
     except Exception, e:
         print e
-        return "FAIL 3"
+        return_code = 'FAIL 3'
     else:
-        return "OK"
+        return_code = 'OK';
+
+    session.close()
+    return return_code
 
 @app.route('/text/<id>', methods=['GET'])
 def display_text(id):
@@ -144,6 +159,7 @@ def display_text(id):
                 html = result.long
     except Exception, e:
         print e
+    session.close()
     return html
 
 if __name__ == '__main__':
