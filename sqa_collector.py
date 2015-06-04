@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import datetime, json, socket
+import ConfigParser, datetime, json, os, socket
 from flask import Flask, request
 from sqlalchemy import create_engine, and_, desc
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +8,23 @@ from sqa_collector_db import DECLARATIVE_BASE, SqaCollector
 
 app = Flask(__name__, static_url_path='')
 app.debug = False
+
+config = ConfigParser.ConfigParser()
+config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'sqa_collector.conf')
+config.read(config_file)
+
+# Max results from database
+try:
+    max_results = config.get('output', 'max_results')    
+except (NoOptionError, NoSectionError):
+    max_results = 100
+
+# Default pagination size
+try:
+    per_page = config.get('output', 'per_page')    
+except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+    per_page = 50
+
 
 enginestr = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
 engine = create_engine(enginestr)
@@ -71,7 +88,7 @@ def display():
       <div class="row">
 '''
     html += '<table id="results" class="table table-bordered"><thead><tr><th>id</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
-    for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(50):
+    for alarm in session.query(SqaCollector).order_by(desc(SqaCollector.started)).limit(max_results):
         html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (alarm.id, alarm.started, alarm.raised_by, alarm.short)
     html += '</tbody></table>'
     html += '''
@@ -83,7 +100,9 @@ def display():
     <script src="/jquery.dynatable.js"></script>
     <script>
             $(document).ready(function() { 
-                $.dynatableSetup({dataset: { perPageDefault: 50 }, writers: { _rowWriter: tableRowWriter}}); 
+'''
+    html += '$.dynatableSetup({dataset: { perPageDefault: ' + str(per_page) + ' }, writers: { _rowWriter: tableRowWriter}});'
+    html += '''
                 $('#results').dynatable(); 
                 $('#results').css('cursor','pointer');
             });
