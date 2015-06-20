@@ -18,6 +18,7 @@ session = DBSession()
 
 seek_hours   = 24
 seek_seconds = 30
+seek_min     = 10 
 
 def main():
     # Get the last hour of events
@@ -40,9 +41,12 @@ def main():
                 alarmbuf['lastdelta'] = delta
             alarmbuf['lasttime'] = alarm.started
             alarmbuf['lastid'] = alarm.id
-           
-    print alarmbuf['cluster']
 
+    for cluster in alarmbuf['cluster'].keys():
+        if len(alarmbuf['cluster'][cluster]) >= seek_min:
+            print "Interesting  %s with num %s" % (cluster, len(alarmbuf['cluster'][cluster]))
+
+           
     session.close()
 
 if __name__ == '__main__':
