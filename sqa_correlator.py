@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import ConfigParser, os, uuid
+import ConfigParser, os, re, uuid
 from datetime import datetime, timedelta
 from sets import Set
 from sqlalchemy import create_engine, and_, desc
@@ -16,9 +16,14 @@ DECLARATIVE_BASE.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Hours to look back
 seek_hours   = 24
+# Seconds to compare for delta
 seek_seconds = 30
+# Min number of events per cluster
 seek_min     = 10 
+# Min number of nodes down per cluster event
+nodes_min    = seek_min
 
 def main():
     # Get the last hour of events
@@ -42,9 +47,17 @@ def main():
             alarmbuf['lasttime'] = alarm.started
             alarmbuf['lastid'] = alarm.id
 
+    # Scan interesting clusters, extract information about brokenness
     for cluster in alarmbuf['cluster'].keys():
         if len(alarmbuf['cluster'][cluster]) >= seek_min:
-            print "Interesting  %s with num %s" % (cluster, len(alarmbuf['cluster'][cluster]))
+            for sqa_id in alarmbuf['cluster'][cluster]:
+                alarm = session.query(SqaCollector).filter(SqaCollector.id == sqa_id)
+                if alarm.count() == 1:
+                    alarm = alarm[0]
+                    nodes_down = re.search(r'\d+ new nodes down', alarm.short)
+                    if nodes_down:
+                        if nodes_down >= nodes_min:
+                            print "TY C=%s A=%s" % (cluster, alarm.id)
 
            
     session.close()
