@@ -21,13 +21,13 @@ except (NoOptionError, NoSectionError):
 
 # Max results from database
 try:
-    max_results = config.get('output', 'max_results')    
+    max_results = config.get('output', 'max_results')
 except (NoOptionError, NoSectionError):
     max_results = 100
 
 # Default pagination size
 try:
-    per_page = config.get('output', 'per_page')    
+    per_page = config.get('output', 'per_page')
 except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
     per_page = 50
 
@@ -89,7 +89,7 @@ def display():
     <div class="container">
       <div class="jumbotron">
         <h1>SQA Collector lookup service</hq>
-        <p class="lead">Welcome to the SQA Collector lookup service, below are the lastest SQA alerts. Times all in UTC.</font></p>
+        <p class="lead">Welcome to the SQA Collector lookup service, below are the latest SQA alerts. Times all in UTC.</font></p>
       </div>
       <div class="row">
 '''
@@ -105,11 +105,11 @@ def display():
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="/jquery.dynatable.js"></script>
     <script>
-            $(document).ready(function() { 
+            $(document).ready(function() {
 '''
     html += '$.dynatableSetup({dataset: { perPageDefault: ' + str(per_page) + ' }, writers: { _rowWriter: tableRowWriter}});'
     html += '''
-                $('#results').dynatable(); 
+                $('#results').dynatable();
                 $('#results').css('cursor','pointer');
             });
 
@@ -128,12 +128,12 @@ def display():
                 $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alert ' + id + '</h4><a href="/view/' + id + '">permalink</a></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
                 $.ajax({url: url, success: function(result){
                     $('#textModal-body-text').text(result);
-                    $('#textModal').modal('show'); 
+                    $('#textModal').modal('show');
                     $('#textModal').css({ 'display': 'block' });
                 }});
             }
 
-    </script> 
+    </script>
 </body>
 </html>
 '''
