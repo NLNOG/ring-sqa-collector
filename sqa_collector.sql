@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS `sqa_collector`.`sqa_correlator_objects` (
   CONSTRAINT `id`
     FOREIGN KEY (`id`)
     REFERENCES `sqa_collector`.`sqa_correlator` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
