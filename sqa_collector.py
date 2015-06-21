@@ -16,13 +16,13 @@ config.read(config_file)
 # Database connector string
 try:
     db_conn_str = config.get('database', 'connection_string')
-except (NoOptionError, NoSectionError):
+except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
     db_conn_str = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
 
 # Max results from database
 try:
     max_results = config.get('output', 'max_results')
-except (NoOptionError, NoSectionError):
+except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
     max_results = 100
 
 # Default pagination size
