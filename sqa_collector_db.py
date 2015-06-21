@@ -27,11 +27,11 @@ class SqaCorrelatorObject(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_correlator_objects'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     )
 
     id = Column(  # pylint: disable=invalid-name
-        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), autoincrement=True,
+        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), autoincrement=False,
         primary_key=True, nullable=False
     )
     sqa_correlator_id = Column(INTEGER, nullable=False)
@@ -73,10 +73,10 @@ class SqaCollectorCorrelator(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_collector_correlator'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
     collector_id = Column(
         INTEGER, ForeignKey("sqa_collector.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
@@ -101,10 +101,10 @@ class SqaCorrelator(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_correlator'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
 
     def __repr__(self):
         return self.__str__()
