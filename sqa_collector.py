@@ -13,6 +13,12 @@ config = ConfigParser.ConfigParser()
 config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'sqa_collector.conf')
 config.read(config_file)
 
+# Database connector string
+try:
+    db_conn_str = config.get('database', 'connection_string')
+except (NoOptionError, NoSectionError):
+    db_conn_str = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
+
 # Max results from database
 try:
     max_results = config.get('output', 'max_results')    
@@ -25,13 +31,13 @@ try:
 except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
     per_page = 50
 
-
-enginestr = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
-engine = create_engine(enginestr)
+# Connect to DB and session
+engine = create_engine(db_conn_str)
 DECLARATIVE_BASE.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Routing
 @app.route('/jquery.dynatable.css', methods=['GET'])
 def dynatableCSS():
     return app.send_static_file('jquery.dynatable.css')
