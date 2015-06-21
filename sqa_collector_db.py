@@ -101,10 +101,10 @@ class SqaCorrelator(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_correlator'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
 
     def __repr__(self):
         return self.__str__()
