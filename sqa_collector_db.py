@@ -23,22 +23,27 @@ else:
 DECLARATIVE_BASE = declarative_base()
 
 
-class SqaCorrelator(DECLARATIVE_BASE):
+class SqaCorrelatorObject(DECLARATIVE_BASE):
 
-    __tablename__ = 'sqa_correlator'
+    __tablename__ = 'sqa_correlator_objects'
     __table_args__ = (
         {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(  # pylint: disable=invalid-name
+        INTEGER, ForeignKey("sqa_correlator.id"), autoincrement=True, primary_key=True, nullable=False
+    )
+    sqa_correlator_id = Column(INTEGER, nullable=False)
     object = Column(VARCHAR(45), nullable=False)
     percentage = Column(INTEGER, nullable=False)
+
+    sqaCorrelator = relationship("SqaCorrelator", foreign_keys=[id], backref="sqaCorrelatorObjects")
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
-        return "<SqaCorrelator(%(id)s)>" % self.__dict__
+        return "<SqaCorrelatorObject(%(id)s)>" % self.__dict__
 
 
 class SqaCollector(DECLARATIVE_BASE):
@@ -75,10 +80,13 @@ class SqaCollectorCorrelator(DECLARATIVE_BASE):
         INTEGER, ForeignKey("sqa_collector.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
     correlator_id = Column(
-        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
+        INTEGER, ForeignKey("sqa_correlator_objects.id", onupdate="CASCADE", ondelete="CASCADE"), index=True,
+        nullable=False
     )
 
-    sqaCorrelator = relationship("SqaCorrelator", foreign_keys=[correlator_id], backref="sqaCollectorCorrelator")
+    sqaCorrelatorObject = relationship(
+        "SqaCorrelatorObject", foreign_keys=[correlator_id], backref="sqaCollectorCorrelator"
+    )
     sqaCollector = relationship("SqaCollector", foreign_keys=[collector_id], backref="sqaCollectorCorrelator")
 
     def __repr__(self):
@@ -86,4 +94,20 @@ class SqaCollectorCorrelator(DECLARATIVE_BASE):
 
     def __str__(self):
         return "<SqaCollectorCorrelator(%(id)s)>" % self.__dict__
+
+
+class SqaCorrelator(DECLARATIVE_BASE):
+
+    __tablename__ = 'sqa_correlator'
+    __table_args__ = (
+        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
+    )
+
+    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __str__(self):
+        return "<SqaCorrelator(%(id)s)>" % self.__dict__
 
