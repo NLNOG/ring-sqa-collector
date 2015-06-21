@@ -31,7 +31,8 @@ class SqaCorrelatorObject(DECLARATIVE_BASE):
     )
 
     id = Column(  # pylint: disable=invalid-name
-        INTEGER, ForeignKey("sqa_correlator.id"), autoincrement=True, primary_key=True, nullable=False
+        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), autoincrement=True,
+        primary_key=True, nullable=False
     )
     sqa_correlator_id = Column(INTEGER, nullable=False)
     object = Column(VARCHAR(45), nullable=False)
