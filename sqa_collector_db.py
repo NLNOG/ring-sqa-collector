@@ -30,15 +30,14 @@ class SqaCorrelatorObject(DECLARATIVE_BASE):
         {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
     )
 
-    id = Column(  # pylint: disable=invalid-name
-        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), autoincrement=False,
-        primary_key=True, nullable=False
+    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    sqa_correlator_id = Column(
+        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
-    sqa_correlator_id = Column(INTEGER, nullable=False)
     object = Column(VARCHAR(45), nullable=False)
     percentage = Column(INTEGER, nullable=False)
 
-    sqaCorrelator = relationship("SqaCorrelator", foreign_keys=[id], backref="sqaCorrelatorObjects")
+    sqaCorrelator = relationship("SqaCorrelator", foreign_keys=[sqa_correlator_id], backref="sqaCorrelatorObjects")
 
     def __repr__(self):
         return self.__str__()
