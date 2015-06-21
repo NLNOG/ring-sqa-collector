@@ -27,10 +27,10 @@ class SqaCorrelatorObject(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_correlator_objects'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
     sqa_correlator_id = Column(
         INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
@@ -72,21 +72,18 @@ class SqaCollectorCorrelator(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_collector_correlator'
     __table_args__ = (
-        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8'}
+        {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
     )
 
-    id = Column(INTEGER, autoincrement=False, primary_key=True, nullable=False)  # pylint: disable=invalid-name
+    id = Column(INTEGER, autoincrement=True, primary_key=True, nullable=False)  # pylint: disable=invalid-name
     collector_id = Column(
         INTEGER, ForeignKey("sqa_collector.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
     correlator_id = Column(
-        INTEGER, ForeignKey("sqa_correlator_objects.id", onupdate="CASCADE", ondelete="CASCADE"), index=True,
-        nullable=False
+        INTEGER, ForeignKey("sqa_correlator.id", onupdate="CASCADE", ondelete="CASCADE"), index=True, nullable=False
     )
 
-    sqaCorrelatorObject = relationship(
-        "SqaCorrelatorObject", foreign_keys=[correlator_id], backref="sqaCollectorCorrelator"
-    )
+    sqaCorrelator = relationship("SqaCorrelator", foreign_keys=[correlator_id], backref="sqaCollectorCorrelator")
     sqaCollector = relationship("SqaCollector", foreign_keys=[collector_id], backref="sqaCollectorCorrelator")
 
     def __repr__(self):
