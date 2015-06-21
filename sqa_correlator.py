@@ -70,13 +70,12 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # Start of code
-
 def main():
 
     # Start logging
     logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                        datefmt='%m-%d %H:%M',
+                        format='%(asctime)s %(process)d %(levelname)-8s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S',
                         filename=log_file,
                         filemode='w')
 
@@ -85,7 +84,7 @@ def main():
         if sys.argv[1] == '-d':
             console = logging.StreamHandler()
             console.setLevel(logging.DEBUG)
-            formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+            formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', '%Y-%m-%d %H:%M:%S')
             console.setFormatter(formatter)
             logging.getLogger('').setLevel(logging.DEBUG)
             logging.getLogger('').addHandler(console)
@@ -159,7 +158,7 @@ def main():
                                     problem_asns.append(find_asn(problem_nodes[0]))
             # Now summarise cluster issues
             if len(confirmed_alarms) > 0:
-                print "Cluster [%s], Alarms [%s], ASN list [%s]" % (cluster, ','.join(confirmed_alarms), pcnt_breakdown(problem_asns))
+                logging.info("Cluster [%s], Alarms [%s], ASN list [%s]" % (cluster, ','.join(confirmed_alarms), pcnt_breakdown(problem_asns)))
 
            
     session.close()
@@ -167,12 +166,14 @@ def main():
 # Look up ADN for an IP address using multiple means
 def find_asn(ip):
     asn = find_asn_cymru(ip)
-    if not asn:
-        asn = find_asn_whois(ip)
-    if not asn:
-        logging.debug("Can't find ASN for ip %s" % ip)
-        asn = 'Unknown'
-    return asn
+    if asn:
+        return 'asn:' + asn
+    else:
+        netname = find_asn_whois(ip)
+        if netname:
+            return 'netname+' + netname
+        else:
+            return 'unknown'
 
 # Look up ASN for an IP address against Cymru, only works if the IP space is routed
 # Advantages = fast, cacheable
