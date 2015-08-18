@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import ConfigParser, dns.resolver, logging, os, re, socket, sys
+from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+import dns.resolver, logging, os, re, socket, sys
 from collections import Counter
 from datetime import datetime, timedelta
 from dns import name, resolver, reversename
@@ -8,7 +9,7 @@ from sqlalchemy import create_engine, and_, desc
 from sqlalchemy.orm import sessionmaker
 from sqa_collector_db import DECLARATIVE_BASE, SqaCollector, SqaCorrelator, SqaCollectorCorrelator, SqaCorrelatorObject
 
-config = ConfigParser.ConfigParser()
+config = ConfigParser()
 config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'sqa_collector.conf')
 config.read(config_file)
 
