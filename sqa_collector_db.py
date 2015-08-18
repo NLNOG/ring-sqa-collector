@@ -13,6 +13,7 @@ except:
 
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, ForeignKey
+from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
 if USE_MYSQL_TYPES:
@@ -72,6 +73,7 @@ class SqaCollectorCorrelator(DECLARATIVE_BASE):
 
     __tablename__ = 'sqa_collector_correlator'
     __table_args__ = (
+        UniqueConstraint('collector_id', 'correlator_id', name='collector_correlator_idx'),
         {'mysql_engine': 'InnoDB', 'sqlite_autoincrement': True, 'mysql_charset': 'utf8'}
     )
 
