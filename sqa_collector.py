@@ -52,8 +52,9 @@ def dynatableCSS():
 def dynatableJS():
     return app.send_static_file('jquery.dynatable.js')
 
+@app.route('/event/<int:event_req>', methods=['GET'])
 @app.route('/', methods=['GET'])
-def display():
+def display(event_req=None):
     html = '''
 <!doctype html>
 
@@ -97,10 +98,36 @@ def display():
         <h1>SQA Collector lookup service</hq>
         <p class="lead">Welcome to the SQA Collector lookup service, below are the latest SQA alerts. Times all in UTC.</font></p>
       </div>
-      <div class="row">
+    <div class="row">
+'''
+    html += '<table id="events" class="table table-bordered"><thead><tr><th>major_event</th><th>started</th><th>contributors</th></tr></thead><tbody>'
+    if event_req:
+        events = session.query(SqaCorrelator).filter(SqaCorrelator.id==event_req)
+    else:
+        events = session.query(SqaCorrelator).order_by(desc(SqaCorrelator.id)).limit(10)
+    for event in events:
+        results = session.query(SqaCorrelatorObject).filter(SqaCorrelatorObject.sqa_correlator_id==event.id)
+        # window
+        first_alarm = session.query(SqaCollectorCorrelator, SqaCollector).filter(SqaCollectorCorrelator.correlator_id==event.id).join(SqaCollector).limit(1)
+        timestamp = first_alarm[0][1].started
+        contrib = ""
+        if results.count() > 0:
+            for result in results:
+                contrib += "%s (%s%%), " % (result.object, result.percentage)
+            html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>%s</td></tr>" % (event.id, event.id, timestamp, contrib)
+        else:
+            html += "<tr><td>%s</td><td>%s</td><td>Unknown</td></tr>" % (event.id, timestamp)
+    html += '</tbody></table>'
+    html += '''
+    </div>
+    <div class="row">
 '''
     html += '<table id="results" class="table table-bordered"><thead><tr><th>major_event</th><th>alarm</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
-    for alarm in session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).order_by(desc(SqaCollector.started)).limit(max_results):
+    if event_req:
+        alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).filter(SqaCollectorCorrelator.correlator_id==event_req).order_by(desc(SqaCollector.started)).limit(max_results)
+    else:
+        alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).order_by(desc(SqaCollector.started)).limit(max_results)
+    for alarm in alarms:
         if alarm.SqaCollectorCorrelator:
             event_id = alarm.SqaCollectorCorrelator.correlator_id if alarm.SqaCollectorCorrelator.correlator_id else 'None'
         else:
@@ -150,7 +177,23 @@ def display():
 
             function showAlarmText(id) {
                 var url = '/alarm_text/' + id;
-                $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alarm ' + id + '</h4><a href="/view_alarm/' + id + '">permalink</a></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
+                $('#textModal').html('
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">View Text - Alarm ' + id + '</h4><a href="/view_alarm/' + id + '">permalink</a>
+                        </div>
+                        <div class="modal-body">
+                            <pre id="textModal-body-text">
+                            </pre>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>');
+
                 $.ajax({url: url, success: function(result){
                     $('#textModal-body-text').text(result);
                     $('#textModal').modal('show');
