@@ -100,7 +100,7 @@ def display(event_req=None):
       </div>
     <div class="row">
 '''
-    html += '<table id="events" class="table table-bordered"><thead><tr><th>major_event</th><th>started</th><th>contributors</th></tr></thead><tbody>'
+    html += '<table id="events" class="table table-bordered"><thead><tr><th>major_event</th><th>Timestamp</th><th>contributors</th></tr></thead><tbody>'
     if event_req:
         events = session.query(SqaCorrelator).filter(SqaCorrelator.id==event_req)
     else:
