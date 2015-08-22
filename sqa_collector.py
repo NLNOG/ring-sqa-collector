@@ -112,6 +112,7 @@ def display(event_req=None):
         timestamp = first_alarm[0][1].started
         contrib = "Unknown"
         if results.count() > 0:
+            contrib = ""
             for result in results:
                 contrib += "%s (%s%%), " % (result.object, result.percentage)
         html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>%s</td></tr>" % (event.id, event.id, timestamp, contrib)
@@ -175,22 +176,7 @@ def display(event_req=None):
 
             function showAlarmText(id) {
                 var url = '/alarm_text/' + id;
-                $('#textModal').html('
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">View Text - Alarm ' + id + '</h4><a href="/view_alarm/' + id + '">permalink</a>
-                        </div>
-                        <div class="modal-body">
-                            <pre id="textModal-body-text">
-                            </pre>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>');
+                $('#textModal').html('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title">View Text - Alarm ' + id + '</h4><a href="/view_alarm/' + id + '">permalink</a></div><div class="modal-body"><pre id="textModal-body-text"></pre><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div>');
 
                 $.ajax({url: url, success: function(result){
                     $('#textModal-body-text').text(result);
