@@ -116,7 +116,7 @@ def display(event_req=None):
                 contrib += "%s (%s%%), " % (result.object, result.percentage)
             html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>%s</td></tr>" % (event.id, event.id, timestamp, contrib)
         else:
-            html += "<tr><td>%s</td><td>%s</td><td>Unknown</td></tr>" % (event.id, timestamp)
+            html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>Unknown</td></tr>" % (event.id, event.id, timestamp)
     html += '</tbody></table>'
     html += '''
     </div>
