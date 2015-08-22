@@ -110,13 +110,11 @@ def display(event_req=None):
         # window
         first_alarm = session.query(SqaCollectorCorrelator, SqaCollector).filter(SqaCollectorCorrelator.correlator_id==event.id).join(SqaCollector).limit(1)
         timestamp = first_alarm[0][1].started
-        contrib = ""
+        contrib = "Unknown"
         if results.count() > 0:
             for result in results:
                 contrib += "%s (%s%%), " % (result.object, result.percentage)
-            html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>%s</td></tr>" % (event.id, event.id, timestamp, contrib)
-        else:
-            html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>Unknown</td></tr>" % (event.id, event.id, timestamp)
+        html += "<tr><td><a href='/event/%s'>%s</a></td><td>%s</td><td>%s</td></tr>" % (event.id, event.id, timestamp, contrib)
     html += '</tbody></table>'
     html += '''
     </div>
