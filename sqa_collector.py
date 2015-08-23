@@ -156,7 +156,7 @@ def display(event_req=None):
             });
 
             function tableRowWriter(rowIndex, record, columns, cellWriter) {
-                row = '<tr>' + tableRowEventTdMaker(record.major_event, record.major_event) + tableRowAlarmTdMaker(record.alarm, record.alarm) + tableRowAlarmTdMaker(record.alarm, record.timestamp) + tableRowAlarmTdMaker(record.alarm, record.raised_by) + tableRowAlarmTdMaker(record.alarm, record.short) + '</tr>';
+                row = '<tr>' + tableRowEventTdMaker(record.major_event, record.major_event) + tableRowAlarmTdMaker(record.alarm, record.alarm) + tableRowAlarmTdMaker(record.alarm, record.timestamp) + tableRowAlarmTdMaker(record.alarm, record.raised_by) + tableRowAlarmTdMaker(record.alarm, record.afi) + tableRowAlarmTdMaker(record.alarm, record.short) + '</tr>';
                 return row;
             }
 
