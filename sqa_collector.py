@@ -121,7 +121,7 @@ def display(event_req=None):
     </div>
     <div class="row">
 '''
-    html += '<table id="results" class="table table-bordered"><thead><tr><th>major_event</th><th>alarm</th><th>timestamp</th><th>raised_by</th><th>short</th></tr></thead><tbody>'
+    html += '<table id="results" class="table table-bordered"><thead><tr><th>major_event</th><th>alarm</th><th>timestamp</th><th>raised_by</th><th>afi</th><th>short</th></tr></thead><tbody>'
     if event_req:
         alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).filter(SqaCollectorCorrelator.correlator_id==event_req).order_by(desc(SqaCollector.started)).limit(max_results)
     else:
@@ -133,10 +133,11 @@ def display(event_req=None):
             event_id = 'None'
         alarm_id = alarm.SqaCollector.id if alarm.SqaCollector.id else 'None'
         started  = alarm.SqaCollector.started if alarm.SqaCollector.started else 'Unknown'
+        afi      = alarm.SqaCollector.afi
         raisedby = alarm.SqaCollector.raised_by if alarm.SqaCollector.raised_by else 'Unknown'
         short    = alarm.SqaCollector.short if alarm.SqaCollector.short else 'No description'
 
-        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (event_id, alarm_id, started, raisedby, short)
+        html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (event_id, alarm_id, started, raisedby, afi, short)
     html += '</tbody></table>'
     html += '''
         </div>
