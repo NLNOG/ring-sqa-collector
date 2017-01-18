@@ -3,7 +3,7 @@
 import ConfigParser, datetime, json, os, socket
 from flask import Flask, request
 from sqlalchemy import create_engine, and_, desc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 from sqa_collector_db import DECLARATIVE_BASE, SqaCollector, SqaCorrelator, SqaCollectorCorrelator, SqaCorrelatorObject
 
 app = Flask(__name__, static_url_path='')
@@ -40,8 +40,8 @@ except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
 # Connect to DB and session
 engine = create_engine(db_conn_str, pool_recycle=db_pool_recycle)
 DECLARATIVE_BASE.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+session_factory = sessionmaker(bind=engine)
+session = scoped_session(session_factory)
 
 # Routing
 @app.route('/jquery.dynatable.css', methods=['GET'])
