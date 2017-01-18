@@ -109,6 +109,8 @@ def display(event_req=None):
         results = session.query(SqaCorrelatorObject).filter(SqaCorrelatorObject.sqa_correlator_id==event.id)
         # window
         first_alarm = session.query(SqaCollectorCorrelator, SqaCollector).filter(SqaCollectorCorrelator.correlator_id==event.id).join(SqaCollector).limit(1)
+        if first_alarm.count() < 1:
+            continue
         timestamp = first_alarm[0][1].started
         contrib = "Unknown"
         if results.count() > 0:
