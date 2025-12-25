@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import ConfigParser, datetime, json, os, socket
+import configparser, datetime, json, os, socket
 from flask import Flask, request
 from sqlalchemy import create_engine, and_, desc
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -216,9 +216,9 @@ def store():
         try:
             raised_by = socket.gethostbyaddr(request.remote_addr)[0]
             if '.' in raised_by:
-                print "Unrecognised sending host %s" % raised_by
+                print("Unrecognised sending host %s" % raised_by)
                 return_code = 'FAIL 1'
-        except Exception, e:
+        except Exception as e:
             app.logger.exception(e)
             return_code = 'FAIL 2'
 
@@ -231,7 +231,7 @@ def store():
                 for open_alarm in open_alarms:
                     open_alarm.ended=datetime.datetime.today()
             session.commit()
-    except Exception, e:
+    except Exception as e:
         app.logger.exception(e)
         return_code = 'FAIL 3'
     else:
@@ -255,7 +255,7 @@ def display_alarm_text(id):
         if results:
             for result in results:
                 html = result.long
-    except Exception, e:
+    except Exception as e:
         app.logger.exception(e)
     session.close()
     return html
@@ -279,7 +279,7 @@ def display_event_text(id):
                     html += "%s(%s%%) " % (result.object, result.percentage)
             else:
                 html = 'No contributors could be determined for this event\n'
-    except Exception, e:
+    except Exception as e:
         app.logger.exception(e)
     session.close()
     return html
@@ -293,7 +293,7 @@ def wrap_teardown_func(teardown_func):
     def log_teardown_error(*args, **kwargs):
         try:
             teardown_func(*args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             app.logger.exception(e)
     return log_teardown_error
 
