@@ -9,32 +9,32 @@ from sqa_collector_db import DECLARATIVE_BASE, SqaCollector, SqaCorrelator, SqaC
 app = Flask(__name__, static_url_path='')
 app.debug = False
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'sqa_collector.conf')
 config.read(config_file)
 
 # Database connector string
 try:
     db_conn_str = config.get('database', 'connection_string')
-except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+except (configparser.NoOptionError, configparser.NoSectionError):
     db_conn_str = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
 
 # Database pool recycle
 try:
     db_pool_recycle = config.get('database', 'pool_recycle')
-except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+except (configparser.NoOptionError, configparser.NoSectionError):
     db_pool_recycle = 3600
 
 # Max results from database
 try:
     max_results = config.get('output', 'max_results')
-except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+except (configparser.NoOptionError, configparser.NoSectionError):
     max_results = 100
 
 # Default pagination size
 try:
     per_page = config.get('output', 'per_page')
-except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+except (configparser.NoOptionError, configparser.NoSectionError):
     per_page = 50
 
 # Connect to DB and session
