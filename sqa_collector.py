@@ -17,7 +17,7 @@ config.read(config_file)
 try:
     db_conn_str = config.get('database', 'connection_string')
 except (configparser.NoOptionError, configparser.NoSectionError):
-    db_conn_str = 'mysql://sqa_collector:sqa_collector@localhost/sqa_collector'
+    db_conn_str = 'mysql+pymysql://sqa_collector:sqa_collector@localhost/sqa_collector'
 
 # Database pool recycle
 try:
