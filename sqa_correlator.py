@@ -1,10 +1,9 @@
-#!/usr/bin/env python
-from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+#!/usr/bin/env python3
+from configparser import ConfigParser, NoOptionError, NoSectionError
 import dns.resolver, logging, os, re, socket, sys
 from collections import Counter
 from datetime import datetime, timedelta
 from dns import name, resolver, reversename
-from sets import Set
 from sqlalchemy import create_engine, and_, desc
 from sqlalchemy.orm import sessionmaker
 from sqa_collector_db import DECLARATIVE_BASE, SqaCollector, SqaCorrelator, SqaCollectorCorrelator, SqaCorrelatorObject
@@ -86,10 +85,10 @@ def main():
     # Bring logging to console if -d provided
     if len(sys.argv) > 1:
         if '-h' in sys.argv:
-            print 'Usage: ./sqa_correlator.py [-h|-d|-a]'
-            print ' -h = this help'
-            print ' -d = debugging to console'
-            print ' -a = perform correlation on all events, ignore seek_hours in config'
+            print('Usage: ./sqa_correlator.py [-h|-d|-a]')
+            print(' -h = this help')
+            print(' -d = debugging to console')
+            print(' -a = perform correlation on all events, ignore seek_hours in config')
             sys.exit(0)
         if '-d' in sys.argv:
             console = logging.StreamHandler()
@@ -115,7 +114,7 @@ def main():
                         clusterid = nextclusterid
                         nextclusterid+=1
                     if alarmbuf['cluster'].get(clusterid) is None:
-                        alarmbuf['cluster'][clusterid] = Set()
+                        alarmbuf['cluster'][clusterid] = set()
                     alarmbuf['cluster'][clusterid].add(alarmbuf['lastid'])
                     alarmbuf['cluster'][clusterid].add(alarm.id)
                 else:
@@ -125,7 +124,7 @@ def main():
             alarmbuf['lastid'] = alarm.id
 
     # Scan interesting clusters, extract information about brokenness
-    for cluster in alarmbuf['cluster'].keys():
+    for cluster in list(alarmbuf['cluster'].keys()):
         # Before we start looking into how big this cluster is, first cycle round it and
         # Find out if any alerms inside it are part of another , existing cluster in the db
         # if so, just attach all of these alarms to the existing db cluster and bail out.
