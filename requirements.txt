@@ -3,3 +3,4 @@ SQLAlchemy
 Flask-SQLAlchemy
 PyMySQL
 dnspython
+cryptography
