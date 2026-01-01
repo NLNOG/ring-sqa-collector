@@ -155,7 +155,7 @@ def main():
                         nodes_down = re.search(r'(\d+) new nodes down', alarm.short)
                         if nodes_down:
                             if nodes_down.groups():
-                                if nodes_down.groups()[0] >= int(nodes_min):
+                                if int(nodes_down.groups()[0]) >= int(nodes_min):
                                     #Note a confirmed alarm
                                     confirmed_alarms.append(str(sqa_id))
                                     #Start analysing the traceroutes
