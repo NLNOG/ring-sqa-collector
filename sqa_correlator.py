@@ -228,9 +228,9 @@ def find_asn_cymru(ip):
     origin_zone  = 'origin6.asn.cymru.com' if ':' in ip else 'origin.asn.cymru.com'
     try:
         # Convert address into format that can be sent to cymru lookup service
-        lookup_target = name.from_unicode(((str(reversename.from_address(ip)).replace(reverse_zone, origin_zone)).decode("utf-8")))
+        lookup_target = name.from_unicode(((str(reversename.from_address(ip)).replace(reverse_zone, origin_zone))))
         # Run query to cymru
-        lookup_result = resolver.query(lookup_target, 'TXT')
+        lookup_result = resolver.resolve(lookup_target, 'TXT')
         # Add result if found
         if lookup_result:
             asn = str(lookup_result[0]).replace('"','').split(' | ')[0]
