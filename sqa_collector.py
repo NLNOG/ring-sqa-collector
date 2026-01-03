@@ -2,6 +2,7 @@
 
 import configparser, datetime, json, os, socket
 from flask import Flask, request
+from datetime import datetime, timedelta
 from sqlalchemy import create_engine, and_, desc
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqa_collector_db import DECLARATIVE_BASE, SqaCollector, SqaCorrelator, SqaCollectorCorrelator, SqaCorrelatorObject
@@ -36,6 +37,12 @@ try:
     per_page = config.get('output', 'per_page')
 except (configparser.NoOptionError, configparser.NoSectionError):
     per_page = 50
+
+# Default seek hours for alarms
+try:
+    seek_hours = config.get('collector', 'seek_hours')
+except (configparser.NoOptionError, configparser.NoSectionError):
+    seek_hours = 99999
 
 # Connect to DB and session
 engine = create_engine(db_conn_str, pool_recycle=db_pool_recycle)
@@ -127,7 +134,7 @@ def display(event_req=None):
     if event_req:
         alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).filter(SqaCollectorCorrelator.correlator_id==event_req).order_by(desc(SqaCollector.started)).limit(max_results)
     else:
-        alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).order_by(desc(SqaCollector.started)).limit(max_results)
+        alarms = session.query(SqaCollector, SqaCollectorCorrelator).outerjoin(SqaCollectorCorrelator).filter(SqaCollector.started>=(datetime.today() - timedelta(hours = int(seek_hours)))).order_by(desc(SqaCollector.started)).limit(max_results)
     for alarm in alarms:
         if alarm.SqaCollectorCorrelator:
             event_id = alarm.SqaCollectorCorrelator.correlator_id if alarm.SqaCollectorCorrelator.correlator_id else 'None'
