@@ -230,13 +230,13 @@ def store():
             return_code = 'FAIL 2'
 
         if blob['status'] == 'raise':
-            session.add(SqaCollector(started=datetime.datetime.today(), raised_by=raised_by, afi=afi, short=short, long=long))
+            session.add(SqaCollector(started=datetime.today(), raised_by=raised_by, afi=afi, short=short, long=long))
             session.commit()
         elif blob['status'] == 'clear':
             open_alarms = session.query(SqaCollector).filter(and_(SqaCollector.raised_by==raised_by, SqaCollector.afi==afi, SqaCollector.ended==None))
             if open_alarms:
                 for open_alarm in open_alarms:
-                    open_alarm.ended=datetime.datetime.today()
+                    open_alarm.ended=datetime.today()
             session.commit()
     except Exception as e:
         app.logger.exception(e)
