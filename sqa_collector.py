@@ -222,10 +222,8 @@ def store():
         long    = blob['long']
         try:
             raised_by = socket.gethostbyaddr(request.remote_addr)[0]
-            if '.' in raised_by:
-                print("Unrecognised sending host %s" % raised_by)
-                return_code = 'FAIL 1'
         except Exception as e:
+            print("Unrecognised sending host %s" % raised_by)
             app.logger.exception(e)
             return_code = 'FAIL 2'
 
